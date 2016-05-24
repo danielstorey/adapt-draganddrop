@@ -1,7 +1,7 @@
 /*
  * adapt-component
  * License - http://github.com/adaptlearning/adapt_framework/LICENSE
- * Maintainers - Kevin Jones <him@kevincjones.co.uk>
+ * Maintainers - Daniel Storey <danielstorey@gmail.com>
  */
 define(function(require) {
 
@@ -402,12 +402,10 @@ define(function(require) {
 							var answerReset = showUserAnswer ? acceptedAnswers[j] : userAnswer;
 							var droppable = _.find($question.children(".ui-droppable"), function(droppable) {
 								var answer = $(droppable).data().answer;
-								console.log(answer);
 								if (usedDroppables.indexOf(droppable) > -1) return false;
 								usedDroppables.push(droppable);
 								return ((!showUserAnswer &&item._accepted.indexOf(answer) === -1) || (showUserAnswer && item._userAnswer.indexOf(answer) === -1));
 							});
-							console.log(acceptedAnswers, droppable);
 							var $droppable = $(droppable);
 							placeDraggables(answerPlace, answerReset, $droppable, this);
 						}, this);
@@ -457,8 +455,6 @@ define(function(require) {
 			var itemLength = this.model.get('_items').length;
 
 			var score = questionWeight * numberOfCorrectAnswers / itemLength;
-
-			console.log(score);
 
 			this.model.set('_score', score);
 		},
