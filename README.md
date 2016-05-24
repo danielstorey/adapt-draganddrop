@@ -1,7 +1,7 @@
 # adapt-draganddrop
 
 **Drag and Drop** is a *presentation component* Created by Dan storey.
-<img align="right" src="https://raw.githubusercontent.com/danielstorey/adapt-resources/master/draganddrop-demo.jpg" alt="Drag and Drop Question Component">
+<img align="right" src="https://raw.githubusercontent.com/danielstorey/adapt-resources/master/draganddrop-demo.jpg" alt="Drag and Drop Question Component" width="400">
 
 A learner must drag the correct answers to the relevant questions. This plug in supports dummy answers and multiple correct answers for each question. the order the answers appear in is random each time the user loads the page so there is no way of telling the dummy answers appart from the correct ones. Configuration is incredibly simple as you will see from the [*example*](https://github.com/danielstorey/adapt-draganddrop/example.json).
 
