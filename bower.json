@@ -1,12 +1,12 @@
 {
   "name": "adapt-draganddrop",
-  "version": "0.1",
+  "version": "1",
   "repository": "git://github.com/danielstorey/adapt-draganddrop.git",
   "homepage": "https://github.com/danielstorey/adapt-draganddrop",
   "authors": [
     "Dan Storey <danielstorey@gmail.com>"
   ],
-  "description": "Drag Drop description here",
+  "description": "Drag and Drop Question Component",
   "main": "/js/adapt-draganddrop.js",
   "keywords": [
     "adapt-plugin",
