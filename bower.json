@@ -1,0 +1,17 @@
+{
+  "name": "adapt-draganddrop",
+  "version": "0.1",
+  "repository": "git://github.com/danielstorey/adapt-draganddrop.git",
+  "homepage": "https://github.com/danielstorey/adapt-draganddrop",
+  "authors": [
+    "Dan Storey <danielstorey@gmail.com>"
+  ],
+  "description": "Drag Drop description here",
+  "main": "/js/adapt-draganddrop.js",
+  "keywords": [
+    "adapt-plugin",
+    "adapt-component",
+    "adapt-draganddrop"
+  ],
+  "license": "GPLv3"
+}
