@@ -1,0 +1,26 @@
+<div class="draganddrop-inner component-inner">
+    {{> component this}}
+    <div class="draganddrop-widget component-widget {{#unless _isEnabled}} disabled {{#if _isComplete}} complete submitted user {{#if _isCorrect}}correct{{/if}} {{/if}} {{/unless}}">
+
+        <div class="draganddrop-container">
+
+            <div class="draganddrop-overlay"></div>
+
+            <div class="draganddrop-questions">
+                {{#each _items}}
+                <div class="draganddrop-question">
+                    <div class="draganddrop-question-text">{{this._text}}</div>
+                </div>
+                {{/each}}
+            </div>
+
+            <div class="draganddrop-answers clearfix">
+            </div>
+
+        </div>
+
+        <div class="buttons">
+        </div>
+        <a onclick="deleteAllCookies();">Delete cookie and refresh page</a>
+    </div>
+</div>  

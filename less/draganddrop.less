@@ -1,0 +1,140 @@
+.draganddrop-inner {
+
+	position: relative;
+
+	.draganddrop-container {
+		position: relative;
+	}
+
+	.draganddrop-overlay {
+		position: absolute;
+		z-index: 10;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		margin: -20px;
+		padding: 20px;
+		background: #000;
+		opacity: 0;
+		transition: opacity 200ms;
+	}
+
+	.draganddrop-widget.dragging .draganddrop-overlay {
+		opacity: 0.4;
+	}
+
+	.buttons, .draganddrop-item {
+		z-index: 11;
+	}
+
+	.draganddrop-questions {
+		margin-bottom: 20px;
+	}
+
+	.draganddrop-question:after {
+		content: '';
+		display: inline-block;
+		width: 100%;
+		height: 0;
+		font-size: 0;
+		line-height: 0;
+	}
+
+	.draganddrop-question.correct:before {
+		content: "\e633";
+	}
+
+	.draganddrop-question.incorrect:before {
+		content: "\e634";
+	}
+
+	.draganddrop-question.correct:before, .draganddrop-question:before {
+		display: block;
+		float: right;
+		position: relative;
+		top: 24px;
+		margin-left: -42px;
+		margin-right: -10px;
+		width: 42px;
+		height: 42px;
+		font-family: 'vanilla';
+		font-size: 32px;
+	}
+
+	.draganddrop-question {
+
+		padding: 20px;
+		margin-bottom: 2px;
+		background: @primary-color;
+		color: @primary-color-inverted;
+		font-size: 1px;
+		text-align: justify;
+		line-height: 0;
+
+		.draganddrop-question-text {
+			display: inline-block;
+			font-size: @body-text-font-size;
+			vertical-align: middle;
+		}
+
+		.ui-droppable {
+			display: inline-block;
+			position: relative;
+			right: 30px;
+			border: 1px dotted;
+			border-color: @primary-color-inverted;
+			vertical-align: middle;
+		}
+
+		.ui-droppable.ui-state-active {
+			background-color: @primary-color;
+		}
+
+		.ui-droppable.ui-state-enabled.ui-state-hover {
+			background-color: lighten(@primary-color, 10%);
+		}
+
+		.ui-droppable.ui-state-disabled {
+			border-style: solid;
+		}
+
+	}
+
+	.draganddrop-answers {
+
+		.draganddrop-answer {
+			float: left;
+			background: #ddd;
+			text-align: center;
+			box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.5);
+			cursor: move;
+		}
+
+		.draganddrop-answer.ui-draggable-disabled {
+			cursor: default;
+		}
+
+		.draganddrop-answer.ui-draggable-dragging {
+			box-shadow: 2px 6px 12px rgba(0, 0, 0, 0.5);
+			z-index: 12;
+		}
+
+		.draganddrop-answer.ui-state-placed {
+			background: none;
+			color: @primary-color-inverted;
+			box-shadow: 0 0 0 rgba(0, 0, 0, 0.5);
+		}
+	}
+
+	.draganddrop-item {
+		-webkit-box-sizing: border-box;
+		-moz-box-sizing: border-box;
+		box-sizing: border-box;
+		display: inline-block;
+		padding: 12px 20px;
+		margin-right: 20px;
+	}
+
+
+}
