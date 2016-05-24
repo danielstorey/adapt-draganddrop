@@ -1,8 +1,3 @@
-/*
- * adapt-component
- * License - http://github.com/adaptlearning/adapt_framework/LICENSE
- * Maintainers - Daniel Storey <danielstorey@gmail.com>
- */
 define(function(require) {
 
 	var Adapt           = require('coreJS/adapt');
