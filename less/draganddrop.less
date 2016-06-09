@@ -32,15 +32,6 @@
 		margin-bottom: 20px;
 	}
 
-	.draganddrop-question:after {
-		content: '';
-		display: inline-block;
-		width: 100%;
-		height: 0;
-		font-size: 0;
-		line-height: 0;
-	}
-
 	.draganddrop-question.correct:before {
 		content: "\e633";
 	}
@@ -53,10 +44,8 @@
 		display: block;
 		float: right;
 		position: relative;
-		top: 24px;
-		margin-left: -42px;
+		top: -10px;
 		margin-right: -10px;
-		width: 42px;
 		height: 42px;
 		font-family: 'vanilla';
 		font-size: 32px;
@@ -68,20 +57,16 @@
 		margin-bottom: 2px;
 		background: @primary-color;
 		color: @primary-color-inverted;
-		font-size: 1px;
 		text-align: justify;
-		line-height: 0;
 
 		.draganddrop-question-text {
-			display: inline-block;
 			font-size: @body-text-font-size;
-			vertical-align: middle;
+			margin-bottom: 20px;
 		}
 
 		.ui-droppable {
 			display: inline-block;
 			position: relative;
-			right: 30px;
 			border: 1px dotted;
 			border-color: @primary-color-inverted;
 			vertical-align: middle;
@@ -133,7 +118,7 @@
 		box-sizing: border-box;
 		display: inline-block;
 		padding: 12px 20px;
-		margin-right: 20px;
+		margin: 0 15px 15px 0;
 	}
 
 
