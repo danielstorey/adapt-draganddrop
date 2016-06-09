@@ -1,3 +1,8 @@
+/*
+ * adapt-component
+ * License - http://github.com/adaptlearning/adapt_framework/LICENSE
+ * Maintainers - Kevin Jones <him@kevincjones.co.uk>
+ */
 define(function(require) {
 
 	var Adapt           = require('coreJS/adapt');
@@ -34,7 +39,6 @@ define(function(require) {
 		},
 
 		setupQuestion: function() {
-			QV = this;
 		},
 
 		setupDragAndDropItems : function () {
@@ -48,7 +52,7 @@ define(function(require) {
 				div.innerHTML = answer;
 				$answerContainer.append(div);
 				$(div).draggable({containment: this.$(".draganddrop-inner")});
-			});
+			}, this);
 
 			//Activate droppables and set heights from draggable heights
 			var hItem = this.$(".draganddrop-answer").height();
@@ -64,8 +68,8 @@ define(function(require) {
 						hoverClass: "ui-state-hover",
 						tolerance: "touch"
 					}).height(hItem);
-				});
-			});
+				}, this);
+			}, this);
 
 			//Set widths of all drag and drop items according to the widest element
 			var $items = this.$(".draganddrop-item");
