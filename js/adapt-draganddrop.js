@@ -43,6 +43,8 @@ define(function(require) {
 
 		setupDragAndDropItems : function () {
 
+			this.isEnabled = true;
+
 			//Create draggable elements and shuffle answers to prevent dummy answers from appearing last
 			var $answerContainer = this.$(".draganddrop-answers");
 			var possibleAnswers = _.shuffle(this.getAnswers(true));
@@ -65,8 +67,7 @@ define(function(require) {
 					elQuestion.appendChild(div);
 					$(div).droppable({
 						activeClass: "ui-state-active",
-						hoverClass: "ui-state-hover",
-						tolerance: "touch"
+						tolerance: "intersect"
 					}).height(hItem);
 				}, this);
 			}, this);
@@ -92,7 +93,6 @@ define(function(require) {
 
 			//Used to store the number of droppables the user is hovering over
 			//Prevents errors when moving to and from overlapping droppables
-			this.numDrops = 0;
 			this.setReadyStatus();
 		},
 
@@ -183,6 +183,11 @@ define(function(require) {
 		},
 
 		onDragStart : function(e, ui) {
+
+			if (!this.isEnabled) return;
+
+			var fromDroppable = ui.helper.data("droppable");
+			ui.helper.data("fromDroppable", fromDroppable);
 			this.$(".draganddrop-widget").addClass("dragging");
 			this.$currentDraggable = ui.helper;
 			this.$currentDraggable.removeClass("ui-state-placed");
@@ -193,33 +198,24 @@ define(function(require) {
 
 		onDragStop : function(e, ui) {
 			this.$(".draganddrop-widget").removeClass("dragging");
-			if (!this.$currentDroppable) {
-				this.resetDraggable();
+			this.$(".ui-state-hover").removeClass("ui-state-hover");
+
+			var fromDroppable = ui.helper.data("fromDroppable");
+			if (fromDroppable && fromDroppable !== this.$currentDroppable) {
+				fromDroppable.removeClass("ui-state-disabled").addClass("ui-state-enabled").removeData();
 			}
+
+			if (!this.$currentDroppable || this.$currentDroppable.is(".ui-state-disabled")) {
+				this.resetDraggable();
+				return;
+			}
+
 			setTimeout(function() {
 				ui.helper.addClass("ui-draggable-dragging");
 			}, 2);
 			setTimeout(function() {
 				ui.helper.removeClass("ui-draggable-dragging");
 			}, this.model.get("animationTime") || 300);
-		},
-
-		onDropActivate : function(e, ui) {
-		},
-
-		onDropDeactivate : function(e, ui) {
-
-		},
-
-		onDrop : function(e, ui) {
-
-			// Revert if dropped on a droppable which already has an answer
-			if (this.$currentDroppable && this.$currentDroppable.is(".ui-state-disabled") && this.numDrops > 0) {
-				this.resetDraggable();
-				return;
-			}
-
-			ui.helper.data("droppable", this.$currentDroppable);
 
 			var userAnswer = this.$currentDraggable.text();
 			this.$currentDroppable.data("userAnswer", userAnswer);
@@ -239,24 +235,29 @@ define(function(require) {
 
 			this.placeDraggable(this.$currentDraggable, this.$currentDroppable, 200);
 			this.storeUserAnswer();
-			this.numDrops = 0;
 		},
 
-		onDropOut : function(e, ui) {
-			this.numDrops --;
+		onDropOut: function(e, ui) {
+			$(e.target).removeClass("ui-state-hover");
 			var $droppable = this.$currentDraggable.data("droppable");
 			if ($droppable) $droppable.removeClass("ui-state-disabled").addClass("ui-state-enabled");
 
-			if (!this.numDrops) {
+			if (this.$currentDroppable && e.target === this.$currentDroppable[0]) {
 				this.$currentDraggable.data("droppable", null);
 				this.$currentDroppable = null;
 			}
 		},
 
-		onDropOver : function(e, ui) {
-			var that = this;
-			this.numDrops ++;
-			that.$currentDroppable = $(e.target);
+		onDropOver: function(e, ui) {
+			var $target = $(e.target);
+			if ($target.is(".ui-state-disabled")) return;
+			if (this.$currentDroppable) this.$currentDroppable.removeClass("ui-state-hover");
+			$target.addClass("ui-state-hover");
+			this.$currentDroppable = $target;
+		},
+
+		setCurrentDroppable: function() {
+
 		},
 
 		placeDraggable: function($draggable, $droppable, animationTime) {
@@ -289,9 +290,11 @@ define(function(require) {
 			$draggable = $draggable || this.$currentDraggable;
 			position = position || $draggable.data().originalPosition;
 			if (animationTime === undefined) animationTime = this.model.get("animationTime") || 300;
+			if ($draggable.data("droppable")) $draggable.data("droppable").addClass("ui-state-enabled");
 
 			$draggable.animate(position, animationTime)
-				.removeClass("ui-state-placed");
+				.removeClass("ui-state-placed")
+				.data("droppable", null);
 
 		},
 
@@ -341,7 +344,7 @@ define(function(require) {
 		onResetClicked: function() {
 
 			this.$(".draganddrop-question").removeClass("correct incorrect");
-			this.$(".ui-droppable").removeClass("ui-state-disabled ");
+			this.$(".ui-droppable").removeClass("ui-state-disabled");
 
 			_.each(this.$(".ui-state-placed"), function(draggable) {
 				this.resetDraggable($(draggable));
@@ -467,9 +470,7 @@ define(function(require) {
 		},
 
 		setAllItemsEnabled: function(isEnabled) {
-			var action = isEnabled ? "enable" : "disable";
-			this.$(".ui-droppable").droppable(action);
-			this.$(".ui-draggable").draggable(action);
+			this.isEnabled = isEnabled;
 		}
 	});
 
