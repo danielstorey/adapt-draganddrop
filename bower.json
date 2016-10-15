@@ -6,7 +6,7 @@
   "authors": [
     "Dan Storey <danielstorey@gmail.com>"
   ],
-  "description": "Drag and Drop Question Component",
+  "description": "A fully working drag and drop question component. Nice animations when toggling between user/model answer. Demo available.",
   "main": "/js/adapt-draganddrop.js",
   "keywords": [
     "adapt-plugin",
