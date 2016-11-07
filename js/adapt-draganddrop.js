@@ -322,7 +322,6 @@ define(function(require) {
 			var numberOfCorrectAnswers = 0;
 			this.model.set('_isAtLeastOneCorrectSelection', false);
 			_.each(this.model.get('_items'), function(item) {
-				console.log(typeof item._accepted);
 				if (typeof item._accepted === "string") {
 					item._isCorrect = item._accepted === item._userAnswer;
 				}
@@ -386,7 +385,6 @@ define(function(require) {
 			_.each(items, function(item, i) {
 
 				var $question = this.$(".draganddrop-question").eq(i);
-					console.log(item);
 				if (typeof item._accepted === "string")  {
 					if (item._accepted !== item._userAnswer) {
 						var $droppable = $question.children(".ui-droppable");
