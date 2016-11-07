@@ -1,0 +1,111 @@
+{
+  "type": "object",
+  "$schema": "http://json-schema.org/draft-04/schema",
+  "id": "http://jsonschema.net",
+  "$ref": "http://localhost/plugins/content/component/model.schema",
+  "globals": {
+    "ariaRegion": {
+      "type": "string",
+      "required": true,
+      "default": "This component is a multiple choice question. Once you have selected an option select the submit button below",
+      "inputType": "Text",
+      "validators": [],
+      "translatable": true
+    }
+  },
+  "properties": {
+    "_supportedLayout": {
+      "type": "string",
+      "required": true,
+      "enum": ["full-width", "half-width", "both"],
+      "default": "half-width",
+      "editorOnly": true
+    },
+    "instruction": {
+      "type": "string",
+      "required": false,
+      "default": "",
+      "inputType": "Text",
+      "validators": [],
+      "help": "This is the instruction text",
+      "translatable": true
+    },
+    "_items": {
+      "type": "array",
+      "required": true,
+      "title": "Items",
+      "items": {
+        "type": "object",
+        "required": true,
+        "properties": {
+          "text": {
+            "type": "string",
+            "required": true,
+            "default": "",
+            "title": "Item Text",
+            "inputType": "Text",
+            "validators": ["required"],
+            "help": "This text will display as the item text",
+            "translatable": true
+          },
+          "_accepted": {
+            "type": "array",
+            "required": true,
+            "title": "Accepted values",
+            "items": {
+              "type": "string",
+              "required": true,
+              "default": "",
+              "title": "Item Text",
+              "inputType": "Text",
+              "validators": ["required"],
+              "help": "Enter all the correct values for this object",
+              "translatable": true
+            }
+          }
+        }
+      }
+    },
+    "dummyAnswers": {
+      "type": "array",
+      "required": true,
+      "title": "Dummy answers",
+      "help": "Enter false answers to test learners",
+      "items": {
+        "type": "string",
+        "required": true,
+        "default": "",
+        "title": "Incorrect answer",
+        "inputType": "Text",
+        "translatable": true
+      }
+    },
+    "animationTime": {
+      "type": "number",
+      "required": true,
+      "default": 1,
+      "title": "Attempts",
+      "inputType": "Number",
+      "validators": ["required", "number"],
+      "help": "Animation time"
+    },
+    "animationDelay": {
+      "type": "number",
+      "required": true,
+      "default": 1,
+      "title": "Attempts",
+      "inputType": "Number",
+      "validators": ["required", "number"],
+      "help": "Animation delay"
+    },
+    "_attempts": {
+      "type": "number",
+      "required": true,
+      "default": 1,
+      "title": "Attempts",
+      "inputType": "Number",
+      "validators": ["required", "number"],
+      "help": "How many attempts the learner is allowed"
+    }
+  }
+}

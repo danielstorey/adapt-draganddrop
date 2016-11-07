@@ -324,6 +324,9 @@ define(function(require) {
 			_.each(this.model.get('_items'), function(item) {
 				if (typeof item._accepted === "string") {
 					item._isCorrect = item._accepted === item._userAnswer;
+				}
+				else if (item._accepted.length === 1) { // if array of single value
+					item._isCorrect = item._accepted === item._userAnswer;
 				} else {
 					item._isCorrect = item._accepted.sort().join() === item._userAnswer.sort().join();
 				}
@@ -382,7 +385,6 @@ define(function(require) {
 			_.each(items, function(item, i) {
 
 				var $question = this.$(".draganddrop-question").eq(i);
-
 				if (typeof item._accepted === "string")  {
 					if (item._accepted !== item._userAnswer) {
 						var $droppable = $question.children(".ui-droppable");
@@ -391,6 +393,7 @@ define(function(require) {
 						placeDraggables(answerPlace, answerReset, $droppable, this);
 					}
 				} else {
+
 					item._userAnswer.sort();
 					item._accepted.sort();
 					if (item._userAnswer.join() !== item._accepted.join()) {
