@@ -2,7 +2,7 @@
     "name": "adapt-draganddrop",
     "repository": "git://github.com/danielstorey/adapt-draganddrop.git",
     "framework": "~2.0.0",
-    "version": "1",
+    "version": "1.0.1",
     "homepage": "https://github.com/danielstorey/adapt-draganddrop",
     "authors": [
         "Dan Storey <danielstorey@gmail.com>"
