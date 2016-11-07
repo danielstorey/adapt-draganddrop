@@ -322,6 +322,7 @@ define(function(require) {
 			var numberOfCorrectAnswers = 0;
 			this.model.set('_isAtLeastOneCorrectSelection', false);
 			_.each(this.model.get('_items'), function(item) {
+				console.log(item);
 				if (typeof item._accepted === "string") {
 					item._isCorrect = item._accepted === item._userAnswer;
 				} else {
@@ -382,7 +383,7 @@ define(function(require) {
 			_.each(items, function(item, i) {
 
 				var $question = this.$(".draganddrop-question").eq(i);
-
+					console.log(item);
 				if (typeof item._accepted === "string")  {
 					if (item._accepted !== item._userAnswer) {
 						var $droppable = $question.children(".ui-droppable");
@@ -391,6 +392,7 @@ define(function(require) {
 						placeDraggables(answerPlace, answerReset, $droppable, this);
 					}
 				} else {
+
 					item._userAnswer.sort();
 					item._accepted.sort();
 					if (item._userAnswer.join() !== item._accepted.join()) {

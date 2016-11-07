@@ -66,6 +66,20 @@
         }
       }
     },
+    "dummyAnswers": {
+      "type": "array",
+      "required": true,
+      "title": "Dummy answers",
+      "help": "Enter false answers to test learners",
+      "items": {
+        "type": "string",
+        "required": true,
+        "default": "",
+        "title": "Incorrect answer",
+        "inputType": "Text",
+        "translatable": true
+      }
+    },
     "animationTime": {
       "type": "number",
       "required": true,
