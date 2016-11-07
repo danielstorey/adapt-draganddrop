@@ -322,8 +322,11 @@ define(function(require) {
 			var numberOfCorrectAnswers = 0;
 			this.model.set('_isAtLeastOneCorrectSelection', false);
 			_.each(this.model.get('_items'), function(item) {
-				console.log(item);
+				console.log(typeof item._accepted);
 				if (typeof item._accepted === "string") {
+					item._isCorrect = item._accepted === item._userAnswer;
+				}
+				else if (item._accepted.length === 1) { // if array of single value
 					item._isCorrect = item._accepted === item._userAnswer;
 				} else {
 					item._isCorrect = item._accepted.sort().join() === item._userAnswer.sort().join();
