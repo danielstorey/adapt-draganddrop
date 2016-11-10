@@ -48,7 +48,7 @@
             "help": "This text will display as the item text",
             "translatable": true
           },
-          "_accepted": {
+          "accepted": {
             "type": "array",
             "required": true,
             "title": "Accepted values",

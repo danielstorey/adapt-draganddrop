@@ -30,11 +30,11 @@ guide the learner’s interaction with the component.
 
 **body** (string): This is the main text for the **Drag and Drop** component.
 
-**_items** (string): Each item represents a question for this component and contains values for **_text** and **_accepted**.
+**_items** (string): Each item represents a question for this component and contains values for **_text** and **accepted**.
 
 >**_text** (string): The text to be displayed for the question.
 
->**_accepted** (mixed): Accepted answers can either be a string for a single answer or an array for multiple answers.
+>**accepted** (mixed): Accepted answers can either be a string for a single answer or an array for multiple answers.
 
 **dummyAnswers** (array): Optional dummy answers to add to the mix.
 
