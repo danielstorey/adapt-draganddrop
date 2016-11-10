@@ -134,7 +134,6 @@ define(function(require) {
 			this.setScore();
 			this.showMarking();
 			this.setupFeedback();
-			this.preventMoving();
 		},
 
 		/************************************** HELPER METHODS **************************************/
@@ -314,9 +313,14 @@ define(function(require) {
 
 		isCorrect: function() {
 			this.markAnswers();
+			this.disableDraggableAnswers();
 
 			// do we have any _isCorrect == false?
 			return !_.contains(_.pluck(this.model.get("_items"),"_isCorrect"), false);
+		},
+
+		disableDraggableAnswers: function() {
+			$('.draganddrop-answers').children().draggable('disable');
 		},
 
 		markAnswers: function() {
