@@ -374,11 +374,21 @@ define(function(require) {
 			this.showAnswer();
 		},
 
+		disableButtonActions: function(val) {
+			this.$('.buttons-action').prop('disabled', val);
+		},
+
 		showAnswer: function(showUserAnswer) {
 			var $droppables = this.$(".ui-droppable");
+			var context = this;
+			this.disableButtonActions(true);
 
 			if (!$droppables.length) return; //Necessary as method is automatically called before drag and drop elements are rendered
+			setTimeout(function() {
+					context.disableButtonActions(false);
+			}, this.model.get("animationTime") || 300);
 
+			if (!$droppables.length) return; //Necessary as method is automatically called before drag and drop elements are rendered
 			var items = this.model.get("_items");
 			var dummyAnswers = this.model.get("dummyAnswers") || [];
 			var userAnswers = _.flatten(_.pluck(items, "_userAnswer"));
