@@ -54,7 +54,7 @@ define(function(require) {
 			//Activate droppables and set heights from draggable heights
 			var hItem = this.$(".draganddrop-answer").height();
 			_.each(this.model.get("_items"), function(item, i) {
-				var accepted = typeof item._accepted === "string" ? [item._accepted] : item._accepted;
+				var accepted = typeof item.accepted === "string" ? [item.accepted] : item.accepted;
 				var elQuestion = this.$(".draganddrop-question")[i];
 				_.each(accepted, function(answer) {
 					var div = document.createElement("div");
@@ -101,7 +101,7 @@ define(function(require) {
 			var i = -1;
 			if (userAnswers) {
 				_.each(this.model.get("_items"), function(item) {
-					var accepted = item._accepted;
+					var accepted = item.accepted;
 					if (typeof accepted === "string") {
 						i++;
 						item._userAnswer = answers[userAnswers[i]];
@@ -155,8 +155,8 @@ define(function(require) {
 
 			var answers = [];
 			_.each(this.model.get("_items"), function (item) {
-				if (typeof item._accepted === "string") answers.push(item._accepted);
-				else _.each(item._accepted, function (accepted) {
+				if (typeof item.accepted === "string") answers.push(item.accepted);
+				else _.each(item.accepted, function (accepted) {
 					answers.push(accepted);
 				});
 			});
@@ -308,22 +308,27 @@ define(function(require) {
 
 		isCorrect: function() {
 			this.markAnswers();
+			this.disableDraggableAnswers();
 
 			// do we have any _isCorrect == false?
 			return !_.contains(_.pluck(this.model.get("_items"),"_isCorrect"), false);
+		},
+
+		disableDraggableAnswers: function() {
+			$('.draganddrop-answers').children().draggable('disable');
 		},
 
 		markAnswers: function() {
 			var numberOfCorrectAnswers = 0;
 			this.model.set('_isAtLeastOneCorrectSelection', false);
 			_.each(this.model.get('_items'), function(item) {
-				if (typeof item._accepted === "string") {
-					item._isCorrect = item._accepted === item._userAnswer;
+				if (typeof item.accepted === "string") {
+					item._isCorrect = item.accepted === item._userAnswer;
 				}
-				else if (item._accepted.length === 1) { // if array of single value
-					item._isCorrect = item._accepted === item._userAnswer;
+				else if (item.accepted.length === 1) { // if array of single value
+					item._isCorrect = item.accepted === item._userAnswer;
 				} else {
-					item._isCorrect = item._accepted.sort().join() === item._userAnswer.sort().join();
+					item._isCorrect = item.accepted.sort().join() === item._userAnswer.sort().join();
 				}
 
 				if (item._isCorrect) {
@@ -364,11 +369,21 @@ define(function(require) {
 			this.showAnswer();
 		},
 
+		disableButtonActions: function(val) {
+			this.$('.buttons-action').prop('disabled', val);
+		},
+
 		showAnswer: function(showUserAnswer) {
 			var $droppables = this.$(".ui-droppable");
+			var context = this;
+			this.disableButtonActions(true);
 
 			if (!$droppables.length) return; //Necessary as method is automatically called before drag and drop elements are rendered
+			setTimeout(function() {
+					context.disableButtonActions(false);
+			}, this.model.get("animationTime") || 300);
 
+			if (!$droppables.length) return; //Necessary as method is automatically called before drag and drop elements are rendered
 			var items = this.model.get("_items");
 			var dummyAnswers = this.model.get("dummyAnswers") || [];
 			var userAnswers = _.flatten(_.pluck(items, "_userAnswer"));
@@ -380,20 +395,20 @@ define(function(require) {
 			_.each(items, function(item, i) {
 
 				var $question = this.$(".draganddrop-question").eq(i);
-				if (typeof item._accepted === "string")  {
-					if (item._accepted !== item._userAnswer) {
+				if (typeof item.accepted === "string")  {
+					if (item.accepted !== item._userAnswer) {
 						var $droppable = $question.children(".ui-droppable");
-						var answerPlace = showUserAnswer ? item._userAnswer : item._accepted;
-						var answerReset = showUserAnswer ? item._accepted : item._userAnswer;
+						var answerPlace = showUserAnswer ? item._userAnswer : item.accepted;
+						var answerReset = showUserAnswer ? item.accepted : item._userAnswer;
 						placeDraggables(answerPlace, answerReset, $droppable, this);
 					}
 				} else {
 
 					item._userAnswer.sort();
-					item._accepted.sort();
-					if (item._userAnswer.join() !== item._accepted.join()) {
-						var itemUserAnswers = _.difference(item._userAnswer, item._accepted);
-						var acceptedAnswers = _.difference(item._accepted, item._userAnswer);
+					item.accepted.sort();
+					if (item._userAnswer.join() !== item.accepted.join()) {
+						var itemUserAnswers = _.difference(item._userAnswer, item.accepted);
+						var acceptedAnswers = _.difference(item.accepted, item._userAnswer);
 						var difference = userAnswers.concat(acceptedAnswers);
 
 						_.each(itemUserAnswers, function(userAnswer, j) {
@@ -404,7 +419,7 @@ define(function(require) {
 								var answer = $(droppable).data().answer;
 								if (usedDroppables.indexOf(droppable) > -1) return false;
 								usedDroppables.push(droppable);
-								return ((!showUserAnswer &&item._accepted.indexOf(answer) === -1) || (showUserAnswer && item._userAnswer.indexOf(answer) === -1));
+								return ((!showUserAnswer &&item.accepted.indexOf(answer) === -1) || (showUserAnswer && item._userAnswer.indexOf(answer) === -1));
 							});
 							var $droppable = $(droppable);
 							placeDraggables(answerPlace, answerReset, $droppable, this);
