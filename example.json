@@ -14,15 +14,15 @@
     "_items": [
         {
             "text": "What colour is The Hulk?",
-            "_accepted": "Green"
+            "accepted": "Green"
         },
         {
             "text": "What colour is Spiderman?",
-            "_accepted": ["Red", "Blue"]
+            "accepted": ["Red", "Blue"]
         },
         {
             "text": "What colour is Wolverine?",
-            "_accepted": "Yellow"
+            "accepted": "Yellow"
         }
 
     ],
