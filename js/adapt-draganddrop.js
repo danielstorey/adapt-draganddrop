@@ -315,7 +315,7 @@ define(function(require) {
 		},
 
 		disableDraggableAnswers: function() {
-			$('.draganddrop-answers').children().draggable('disable');
+			this.$('.draganddrop-answers').children().draggable('disable');
 		},
 
 		markAnswers: function() {
