@@ -1,74 +1,57 @@
 define(function(require) {
 
-	var Adapt           = require('coreJS/adapt');
-	var QuestionView    = require('coreViews/questionView');
-	var JQueryUI        =  require('./jquery-ui.js');
-	var TouchPunch      = require('./jquery.ui.touch-punch.js')
+	var Adapt = require("coreJS/adapt");
+	var QuestionView = require("coreViews/questionView");
+	var JQueryUI = require("./jquery-ui.js");
+	var TouchPunch = require("./jquery.ui.touch-punch.js")
 
-	var DragAndDrop = QuestionView.extend({
+	var dragndrop = QuestionView.extend({
 
 		events: {
 			"dragcreate .ui-draggable": "onDragCreate",
 			"dragstart .ui-draggable": "onDragStart",
 			"drag .ui-draggable": "onDrag",
 			"dragstop .ui-draggable": "onDragStop",
-			"dropactivate .ui-droppable": "onDropActivate",
-			"dropdeactivate .ui-droppable": "onDropDeactivate",
 			"drop .ui-droppable": "onDrop",
 			"dropout .ui-droppable": "onDropOut",
-			"dropover .ui-droppable": "onDropOver",
-
-			"click .draganddrop-widget .button.reset": "onResetClicked",
-			"click .draganddrop-widget .button.model": "onModelAnswerClicked",
-			"click .draganddrop-widget .button.user": "onUserAnswerClicked"
-
+			"dropover .ui-droppable": "onDropOver"
 		},
 
 		/************************************** SETUP METHODS **************************************/
 
-		postRender: function() {
-			this.setupDragAndDropItems();
-			this.restoreUserAnswer();
-			this.addButtonsView();
+		setupQuestion: function() {
 
+			// Create a single, random array of all available answers
+			var possibleAnswers = _.shuffle(this.getAnswers(true));
+			this.model.set("_possibleAnswers", possibleAnswers);
+
+			// Make sure each item's accepted answer is an array - even single values
+			// This simplifies future operations
+			_.each(this.model.get("_items"), function(item) {
+				if (typeof item.accepted === "string") item.accepted = [item.accepted];
+			});
 		},
 
-		setupQuestion: function() {
+		onQuestionRendered: function() {
+			this.setupDragAndDropItems();
+			//this.restoreUserAnswer();
+			this.setReadyStatus();
 		},
 
 		setupDragAndDropItems : function () {
 
-			this.isEnabled = true;
-
-			//Create draggable elements and shuffle answers to prevent dummy answers from appearing last
-			var $answerContainer = this.$(".draganddrop-answers");
-			var possibleAnswers = _.shuffle(this.getAnswers(true));
-			_.each(possibleAnswers, function(answer){
-				var div = document.createElement("div");
-				div.className = "draganddrop-item draganddrop-answer";
-				div.innerHTML = answer;
-				$answerContainer.append(div);
-				$(div).draggable({containment: this.$(".draganddrop-inner")});
-			}, this);
+			this.$(".dragndrop-answer").draggable({containment: this.$(".dragndrop-inner")});
 
 			//Activate droppables and set heights from draggable heights
-			var hItem = this.$(".draganddrop-answer").height();
-			_.each(this.model.get("_items"), function(item, i) {
-				var accepted = typeof item.accepted === "string" ? [item.accepted] : item.accepted;
-				var elQuestion = this.$(".draganddrop-question")[i];
-				_.each(accepted, function(answer) {
-					var div = document.createElement("div");
-					div.className = "draganddrop-item ui-state-enabled";
-					elQuestion.appendChild(div);
-					$(div).droppable({
-						activeClass: "ui-state-active",
-						tolerance: "intersect"
-					}).height(hItem);
-				}, this);
-			}, this);
+			var hItem = this.$(".dragndrop-answer").height();
+
+			this.$(".dragndrop-droppable").droppable({
+				activeClass: "ui-state-active",
+				tolerance: "intersect"
+			}).height(hItem);
 
 			//Set widths of all drag and drop items according to the widest element
-			var $items = this.$(".draganddrop-item");
+			var $items = this.$(".dragndrop-item");
 			var wMax = this.getMaxWidth($items);
 			$items.width(wMax);
 
@@ -80,15 +63,6 @@ define(function(require) {
 					position: $draggable.position()
 				});
 			});
-
-			//Prevent highlighting text when drag and drop is disabled
-			this.$(".draganddrop-container").mousedown(function (e) {
-				e.preventDefault();
-			});
-
-			//Used to store the number of droppables the user is hovering over
-			//Prevents errors when moving to and from overlapping droppables
-			this.setReadyStatus();
 		},
 
 		restoreUserAnswer: function() {
@@ -102,16 +76,11 @@ define(function(require) {
 			if (userAnswers) {
 				_.each(this.model.get("_items"), function(item) {
 					var accepted = item.accepted;
-					if (typeof accepted === "string") {
+					item._userAnswer = [];
+					_.each(accepted, function() {
 						i++;
-						item._userAnswer = answers[userAnswers[i]];
-					} else {
-						item._userAnswer = [];
-						_.each(accepted, function() {
-							i++;
-							item._userAnswer.push(answers[userAnswers[i]]);
-						});
-					}
+						item._userAnswer.push(answers[userAnswers[i]]);
+					});
 				});
 
 				_.each(userAnswers, function (answerIndex, i) {
@@ -143,7 +112,7 @@ define(function(require) {
 		},
 
 		getDraggableByText: function(text) {
-			var draggable = _.find(this.$(".draganddrop-answer"), function(draggable) {
+			var draggable = _.find(this.$(".dragndrop-answer"), function(draggable) {
 				var $draggable = $(draggable);
 				return $draggable.text() === text;
 			});
@@ -152,13 +121,9 @@ define(function(require) {
 		},
 
 		getAnswers: function(includeDummyAnswers) {
-
 			var answers = [];
 			_.each(this.model.get("_items"), function (item) {
-				if (typeof item.accepted === "string") answers.push(item.accepted);
-				else _.each(item.accepted, function (accepted) {
-					answers.push(accepted);
-				});
+				answers = answers.concat(item.accepted);
 			});
 
 			if (includeDummyAnswers) {
@@ -179,11 +144,11 @@ define(function(require) {
 
 		onDragStart : function(e, ui) {
 
-			if (!this.isEnabled) return;
+			if (!this.model.get("_isEnabled")) return;
 
 			var fromDroppable = ui.helper.data("droppable");
 			ui.helper.data("fromDroppable", fromDroppable);
-			this.$(".draganddrop-widget").addClass("dragging");
+			this.$(".dragndrop-widget").addClass("dragging");
 			this.$currentDraggable = ui.helper;
 			this.$currentDraggable.removeClass("ui-state-placed");
 		},
@@ -192,7 +157,7 @@ define(function(require) {
 		},
 
 		onDragStop : function(e, ui) {
-			this.$(".draganddrop-widget").removeClass("dragging");
+			this.$(".dragndrop-widget").removeClass("dragging");
 			this.$(".ui-state-hover").removeClass("ui-state-hover");
 
 			var fromDroppable = ui.helper.data("fromDroppable");
@@ -225,7 +190,7 @@ define(function(require) {
 					return $(droppable).data("userAnswer");
 				});
 			} else {
-				item._userAnswer = userAnswer;
+				item._userAnswer = [userAnswer];
 			}
 
 			this.placeDraggable(this.$currentDraggable, this.$currentDroppable, 200);
@@ -300,53 +265,37 @@ define(function(require) {
 		},
 
 		showMarking: function() {
-			_.each(this.model.get('_items'), function(item, i) {
-				var $question = this.$('.draganddrop-question').eq(i);
-				$question.removeClass('correct incorrect').addClass(item._isCorrect ? 'correct' : 'incorrect');
+			_.each(this.model.get("_items"), function(item, i) {
+				var $question = this.$(".dragndrop-question").eq(i);
+				$question.removeClass("correct incorrect").addClass(item._isCorrect ? "correct" : "incorrect");
 			}, this);
 		},
 
 		isCorrect: function() {
 			this.markAnswers();
-			this.disableDraggableAnswers();
 
 			// do we have any _isCorrect == false?
 			return !_.contains(_.pluck(this.model.get("_items"),"_isCorrect"), false);
 		},
 
-		disableDraggableAnswers: function() {
-			this.$('.draganddrop-answers').children().draggable('disable');
-		},
-
 		markAnswers: function() {
 			var numberOfCorrectAnswers = 0;
-			this.model.set('_isAtLeastOneCorrectSelection', false);
-			_.each(this.model.get('_items'), function(item) {
-				if (typeof item.accepted === "string") {
-					item._isCorrect = item.accepted === item._userAnswer;
-				}
-				else if (item.accepted.length === 1) { // if array of single value
-					item._isCorrect = item.accepted === item._userAnswer;
-				} else {
-					item._isCorrect = item.accepted.sort().join() === item._userAnswer.sort().join();
-				}
+			this.model.set("_isAtLeastOneCorrectSelection", false);
+			_.each(this.model.get("_items"), function(item) {
+
+				item._isCorrect = item.accepted.sort().join() === item._userAnswer.sort().join();
 
 				if (item._isCorrect) {
 					numberOfCorrectAnswers ++;
-					this.model.set('_numberOfCorrectAnswers', numberOfCorrectAnswers);
-					this.model.set('_isAtLeastOneCorrectSelection', true);
+					this.model.set("_numberOfCorrectAnswers", numberOfCorrectAnswers);
+					this.model.set("_isAtLeastOneCorrectSelection", true);
 				}
 			}, this);
 		},
 
-		onEnabledChanged: function() {
-			var isEnabled = this.model.get('_isEnabled');
-			this.setAllItemsEnabled(isEnabled)
-		},
+		resetQuestion: function() {
 
-		onResetClicked: function() {
-
-			this.$(".draganddrop-question").removeClass("correct incorrect");
+			this.$(".dragndrop-question").removeClass("correct incorrect");
 			this.$(".ui-droppable").removeClass("ui-state-disabled");
 
 			_.each(this.$(".ui-state-placed"), function(draggable) {
@@ -356,9 +305,6 @@ define(function(require) {
 			_.each(this.model.get("_items"), function(item, i){
 				item._isCorrect = false;
 			});
-
-			this.setQuestionAsReset();
-			this.updateButtons();
 		},
 
 		hideCorrectAnswer: function() {
@@ -370,7 +316,7 @@ define(function(require) {
 		},
 
 		disableButtonActions: function(val) {
-			this.$('.buttons-action').prop('disabled', val);
+			this.$(".buttons-action").prop("disabled", val);
 		},
 
 		showAnswer: function(showUserAnswer) {
@@ -380,7 +326,7 @@ define(function(require) {
 
 			if (!$droppables.length) return; //Necessary as method is automatically called before drag and drop elements are rendered
 			setTimeout(function() {
-					context.disableButtonActions(false);
+				context.disableButtonActions(false);
 			}, this.model.get("animationTime") || 300);
 
 			if (!$droppables.length) return; //Necessary as method is automatically called before drag and drop elements are rendered
@@ -394,37 +340,28 @@ define(function(require) {
 
 			_.each(items, function(item, i) {
 
-				var $question = this.$(".draganddrop-question").eq(i);
-				if (typeof item.accepted === "string")  {
-					if (item.accepted !== item._userAnswer) {
-						var $droppable = $question.children(".ui-droppable");
-						var answerPlace = showUserAnswer ? item._userAnswer : item.accepted;
-						var answerReset = showUserAnswer ? item.accepted : item._userAnswer;
+				var $question = this.$(".dragndrop-question").eq(i);
+
+				item._userAnswer.sort();
+				item.accepted.sort();
+				if (item._userAnswer.join() !== item.accepted.join()) {
+					var itemUserAnswers = _.difference(item._userAnswer, item.accepted);
+					var acceptedAnswers = _.difference(item.accepted, item._userAnswer);
+					var difference = userAnswers.concat(acceptedAnswers);
+
+					_.each(itemUserAnswers, function(userAnswer, j) {
+
+						var answerPlace = showUserAnswer ? userAnswer : acceptedAnswers[j];
+						var answerReset = showUserAnswer ? acceptedAnswers[j] : userAnswer;
+						var droppable = _.find($question.children(".ui-droppable"), function(droppable) {
+							var answer = $(droppable).data().answer;
+							if (usedDroppables.indexOf(droppable) > -1) return false;
+							usedDroppables.push(droppable);
+							return ((!showUserAnswer && item.accepted.indexOf(answer) === -1) || (showUserAnswer && item._userAnswer.indexOf(answer) === -1));
+						});
+						var $droppable = $(droppable);
 						placeDraggables(answerPlace, answerReset, $droppable, this);
-					}
-				} else {
-
-					item._userAnswer.sort();
-					item.accepted.sort();
-					if (item._userAnswer.join() !== item.accepted.join()) {
-						var itemUserAnswers = _.difference(item._userAnswer, item.accepted);
-						var acceptedAnswers = _.difference(item.accepted, item._userAnswer);
-						var difference = userAnswers.concat(acceptedAnswers);
-
-						_.each(itemUserAnswers, function(userAnswer, j) {
-
-							var answerPlace = showUserAnswer ? userAnswer : acceptedAnswers[j];
-							var answerReset = showUserAnswer ? acceptedAnswers[j] : userAnswer;
-							var droppable = _.find($question.children(".ui-droppable"), function(droppable) {
-								var answer = $(droppable).data().answer;
-								if (usedDroppables.indexOf(droppable) > -1) return false;
-								usedDroppables.push(droppable);
-								return ((!showUserAnswer &&item.accepted.indexOf(answer) === -1) || (showUserAnswer && item._userAnswer.indexOf(answer) === -1));
-							});
-							var $droppable = $(droppable);
-							placeDraggables(answerPlace, answerReset, $droppable, this);
-						}, this);
-					}
+					}, this);
 				}
 			}, this);
 
@@ -465,28 +402,23 @@ define(function(require) {
 		},
 
 		setScore: function() {
-			var numberOfCorrectAnswers = this.model.get('_numberOfCorrectAnswers') || 0;
+			var numberOfCorrectAnswers = this.model.get("_numberOfCorrectAnswers") || 0;
 			var questionWeight = this.model.get("_questionWeight");
-			var itemLength = this.model.get('_items').length;
+			var itemLength = this.model.get("_items").length;
 
 			var score = questionWeight * numberOfCorrectAnswers / itemLength;
 
-			this.model.set('_score', score);
+			this.model.set("_score", score);
 		},
 
 		disableQuestion: function() {
-			this.setAllItemsEnabled(false);
+			this.$(".dragndrop-answers").children().draggable("disable");
 		},
 
 		enableQuestion: function() {
-			this.setAllItemsEnabled(true);
-		},
-
-		setAllItemsEnabled: function(isEnabled) {
-			this.isEnabled = isEnabled;
+			this.$(".dragndrop-answers").children().draggable("enable");
 		}
 	});
 
-	Adapt.register("draganddrop", DragAndDrop);
-
+	Adapt.register("dragndrop", dragndrop);
 });
